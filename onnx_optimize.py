@@ -6,7 +6,11 @@ import onnxruntime as ort
 import numpy as np
 import time
 from onnxruntime.quantization import QuantType, quantize_dynamic
+import subprocess
 
+'''
+本页代码提供onnx模型有效性验证、多种onnx模型计算图优化函数、模型推理时间测量的功能
+'''
 
 def onnx_verify(onnx_model_path):
 
@@ -30,6 +34,7 @@ def onnx_simple(onnx_model_path, output_path=None):
     
     Parameters:
     - onnx_model_path: 'path_to_your_model.onnx' 
+    - output_model_path: Path where the optimized ONNX model will be saved.
     '''
     onnx_model = onnx.load(onnx_model_path)
     model_simp, check = simplify(onnx_model)
@@ -40,6 +45,29 @@ def onnx_simple(onnx_model_path, output_path=None):
         output_path = output_path
     onnx.save(model_simp, output_path)
     print('finished exporting simplified onnx!')
+
+def optimize_onnx_model(input_model_path, output_model_path=None):
+    """
+    Optimize an ONNX model using the onnxoptimizer.
+
+    Parameters:
+    - input_model_path: Path to the input ONNX model.
+    - output_model_path: Path where the optimized ONNX model will be saved.
+    """
+    if output_model_path == None:
+        output_model_path = input_model_path[0:-5]+"_opt.onnx"
+    else:
+        output_model_path = output_model_path
+
+    command = ["python", "-m", "onnxoptimizer", input_model_path, output_model_path]
+    # 确保了输出以文本形式
+    result = subprocess.run(command, capture_output=True, text=True)
+    
+    if result.returncode == 0:
+        print("Model optimized successfully!")
+    else:
+        print("Failed to optimize the model.")
+        print("Error message:", result.stderr)
 
 def onnx_to_fp16(output_path):
 
@@ -57,7 +85,7 @@ def onnx_quantize_dynamic(onnx_model_path, quant_type = "int8", output_path=None
 
     Parameters:
     - onnx_model_path: Path to the input ONNX model.
-    - quant_type: Type of quantization to apply ('fp16' or 'int8'). Default is 'fp16'.
+    - quant_type: Type of quantization to apply ('uint8' or 'int8'). Default is 'int8'.
     - output_path: Path where the quantized ONNX model will be saved. If None, the quantized model will be saved
                    next to the original model with a "_quant" suffix.
 
@@ -77,25 +105,21 @@ def onnx_quantize_dynamic(onnx_model_path, quant_type = "int8", output_path=None
     else:
         output_path = output_path
 
-    print("start")
+    print("Start quantization...")
     # quantize_dynamic (
     #     model_input=onnx_model_path, # 输入模型
     #     model_output=model_quant_dynamic, # 输出模型
     #     weight_type=qtype, # 参数类型 Int8 / UInt8
-    #     optimize_model=True # 是否优化模型
+    #     optimize_model=True # 是否优化模型这个参数新版本没了
     # )
 
     quantize_dynamic (
         model_input=onnx_model_path, # 输入模型
         model_output=output_path, # 输出模型
-        weight_type=qtype
+        weight_type=qtype,
+        optimize_model=True
     )
-    print(f"quantize_dynamic success! Model saved to {output_path}")
-
-# 模型路径
-model_fp32 = 'model_c2_dep5_db18_drum_epo100_mon1.onnx'
-model_quant_dynamic = 'model_c2_dep5_db18_drum_epo100_mon1_Quant_Float16.onnx'
-
+    print(f"Dynamic quantization success! Model saved to {output_path}")
 
 
 def onnx_infer(onnx_model_path, input_data_shape, input_data = None):
@@ -161,16 +185,15 @@ def infer_mean_time_measurement(func, loop_cnt=20):
     return average_time
 
 
-# average_time = infer_mean_time_measurement(onnx_infer, loop_cnt=20)
+
 
 
 onnx_model_path = r'onnx_models\model_c2_dep4_db18_gun.onnx'
+
+
+optimize_onnx_model(onnx_model_path)
 # onnx_verify(onnx_model_path) # ok
 # onnx_simple(onnx_model_path) # ok
-onnx_quantize_dynamic(onnx_model_path)
-
-# onnx_model = onnx.load(onnx_model_path)  # load onnx model
-# # Example usage
-# model_path = 'path_to_your_model.onnx'  # Update this to the path of your ONNX model
-# input_data = np.random.randn(1, 3, 224, 224).astype(np.float32)  # Example input. Adjust the shape according to your model's requirements.
+# average_time = infer_mean_time_measurement(onnx_infer, loop_cnt=20) #ok
+# onnx_quantize_dynamic(onnx_model_path, quant_type = "uint8") #ok
 
