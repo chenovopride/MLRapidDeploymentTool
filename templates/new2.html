@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <title>AI Model Optimization Portal</title>
+    <style>
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            color: #333;
+        }
+        nav ul {
+            padding: 0;
+            list-style-type: none;
+            text-align: center;
+        }
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+        }
+        nav ul li a:hover {
+            color: #000;
+        }
+        main {
+            padding: 5em 1em;
+            line-height: 1.6;
+        }
+        footer {
+            text-align: center;
+            padding: 2em 1em;
+        }
+        footer a {
+            text-decoration: none;
+            color: #333;
+        }
+        footer a:hover {
+            color: #000;
+        }
+        .button-primary {
+            background-color: #333;
+            color: white;
+            padding: 0.5em 1em;
+            text-decoration: none;
+            border: none;
+            border-radius: 2px;
+        }
+        .button-primary:hover {
+            background-color: #000;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        .grid {
+            display: grid;
+            grid-gap: 1em;
+        }
+        h2, h3 {
+            color: #333;
+            text-align: center;
+        }
+        figure img {
+            width: 100%;
+            height: auto;
+            border-radius: 2px;
+        }
+        figcaption {
+            text-align: center;
+            font-size: smaller;
+            color: #666;
+        }
+        form input, form select, form button {
+            width: 100%;
+            padding: 1em;
+            margin: 0.5em 0;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+        }
+        form button {
+            background-color: #333;
+            color: white;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <nav class="container-fluid">
+        <ul>
+            <li><strong>AI Model Optimization</strong></li>
+        </ul>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#" role="button">Support</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <div class="grid">
+            <section>
+                <hgroup>
+                    <h2>Optimize Your AI Models</h2>
+                    <h3>Seamless Integration and Testing</h3>
+                </hgroup>
+                <p>Upload your AI model and test data, choose your preferences, and generate optimized versions with ease.</p>
+                <figure>
+                    <img src="https://source.unsplash.com/random/800x600?japan,technology" alt="Japanese-inspired Tech" />
+                    <figcaption>Inspired by Japanese Minimalism</figcaption>
+                </figure>
+                <h3>Progress Tracking</h3>
+                <p>Monitor the optimization status and evaluate the performance of each AI model variant.</p>
+                <h3>Easy Download</h3>
+                <p>Access all your optimized models and corresponding integration code in one click.</p>
+            </section>
+        </div>
+    </main>
+
+    <section aria-label="Model Optimization Form">
+        <div class="container">
+            <article>
+                <hgroup>
+                    <h2>Model Optimization Form</h2>
+                    <h3>Fill in the details to proceed</h3>
+                </hgroup>
+                <form class="grid">
+                    <input type="file" id="model-upload" name="model-upload" aria-label="Upload your model" required />
+                    <input type="file" id="data-upload" name="data-upload" aria-label="Upload test data" required />
+                    <select id="output-format" name="output-format" aria-label="Select output format">
+                        <option value="format1">ONNX</option>
+                        <option value="format2">TensorFlow</option>
+                        <option value="format3">PyTorch</option>
+                    </select>
+                    <input type="text" id="priority" name="priority" placeholder="Define priority" aria-label="Define priority" required />
+                    <button type="submit" class="button-primary" onclick="event.preventDefault()">Generate</button>
+                </form>
+            </article>
+        </div>
+    </section>
+
+    <footer class="container">
+        <small>
+            <a href="#">Privacy</a> • <a href="#">Terms</a>
+        </small>
+    </footer>
+</body>
+</html>
