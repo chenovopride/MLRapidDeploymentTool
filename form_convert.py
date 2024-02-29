@@ -15,6 +15,7 @@ import subprocess
 - 更适合英伟达显卡使用的：tensorRT(.trt)
 - 通用格式：onnx格式，不用转换
 - 更适合嵌入式、微处理器平台的：tflite (需要进一步转换为c数组并编译到目标平台的程序中)
+- 一般用于训练的：tensorflow saved_model 格式（文件夹形式）
 
 '''
 
@@ -159,7 +160,7 @@ def onnx_to_tflite(onnx_model_path, tflite_model_path=None, convert_model_path =
         tflite_model_path_name = Path(onnx_model_path).name[0:-5] +".tflite"
         tflite_model_path = os.path.join(os.getcwd(), convert_model_path, tflite_model_path_name)
         print("onnx_model_path:", onnx_model_path)
-        print("tflite_model_path:", tflite_model_path_name)
+        print("tflite_model_path:", tflite_model_path)
     else:
         tflite_model_path = tflite_model_path
 
@@ -182,7 +183,24 @@ def onnx_to_tflite(onnx_model_path, tflite_model_path=None, convert_model_path =
     with open(tflite_model_path, 'wb') as f:
         f.write(tflite_model)
 
+def onnx_to_tensorflow(onnx_model_path, tf_model_path=None, convert_model_path = "converted_models"):
+
+    if tf_model_path == None:
+        tf_model_path_name = Path(onnx_model_path).name[0:-5] +"_tf"
+        tf_model_path = os.path.join(os.getcwd(), convert_model_path, tf_model_path_name)
+        print("onnx_model_path:", onnx_model_path)
+        print("tf_model_path:", tf_model_path)
+    else:
+        tf_model_path = tf_model_path
+
+    onnx_model = onnx.load(onnx_model_path)
+
+    # 使用onnx-tf转换ONNX模型为TensorFlow模型
+    tf_rep = prepare(onnx_model)
+    tf_rep.export_graph(tf_model_path)
+
 onnx_model_path = r'onnx_models\model_c2_dep4_db18_gun.onnx'
 
-onnx_to_tflite(onnx_model_path)
+# onnx_to_tflite(onnx_model_path)
+# onnx_to_tensorflow(onnx_model_path)
 # onnx_to_mnn(onnx_model_path)
