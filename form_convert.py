@@ -5,6 +5,9 @@ import tf2onnx
 import onnx
 from onnx_tf.backend import prepare
 import tensorflow_probability
+from pathlib import Path
+import os
+import subprocess
 
 '''
 本页代码提供onnx模型转换功能。支持的目标格式有：
@@ -113,7 +116,41 @@ import tensorflow_probability
 # ------
 
 # onnx to mnn
+def onnx_to_mnn(onnx_model_path, mnn_model_path=None, convert_model_path = "converted_models"):
 
+    """
+    Convert onnx model to mnn model
+
+    Parameters:
+    - onnx_model_path: Path to the input ONNX model.
+    - mnn_model_path: Path where the optimized ONNX model will be saved.
+    - convert_model_path: Default path for converted model.
+    """
+    
+    if mnn_model_path == None:
+        mnn_model_path_name = Path(onnx_model_path).name[0:-5] +".mnn"
+        # mnn_model_path = convert_model_path + mnn_model_path_name
+        mnn_model_path = os.path.join(os.getcwd(), convert_model_path, mnn_model_path_name)
+        # print("os.getcwd():", os.getcwd())
+        print("onnx_model_path:", onnx_model_path)
+        print("mnn_model_path:", mnn_model_path)
+    else:
+        mnn_model_path = mnn_model_path
+    #./MNNConvert -f ONNX --modelFile XXX.onnx --MNNModel XXX.mnn --bizCode biz
+
+
+    command = 'MNNConvert'
+    # 将命令的各个部分组合成一个列表
+    cmd = [command, "-f","ONNX", "--modelFile", onnx_model_path,"--MNNModel", mnn_model_path]
+    result = subprocess.run(cmd, capture_output=True, text=True, shell=True)
+    
+    if result.returncode == 0:
+        # print(result.stdout)
+        print("MNN model converted successfully!")
+    else:
+        print("Failed to convert the mnn model.")
+        print("Error message:", result.stdout)
+        print("Error message:", result.stderr)
 # onnx to trt
 
 def onnx_to_tflite(onnx_model_path, tf_model_path, tflite_model_path):
@@ -136,7 +173,10 @@ def onnx_to_tflite(onnx_model_path, tf_model_path, tflite_model_path):
 # 第一步：将ONNX模型转换为TensorFlow模型
 onnx_model_path = r'onnx_models\model_c2_dep4_db18_gun.onnx'
 # onnx_model_path = 'your_model.onnx'  # ONNX模型文件路径
-tf_model_path = 'your_tf_model'  # TensorFlow模型保存路径
-# 第二步：将TensorFlow模型转换为TFLite模型
-tflite_model_path = 'your_model.tflite'  # TFLite模型保存路径
-onnx_to_tflite(onnx_model_path, tf_model_path, tflite_model_path)
+# tf_model_path = 'your_tf_model'  # TensorFlow模型保存路径
+# # 第二步：将TensorFlow模型转换为TFLite模型
+# tflite_model_path = 'your_model.tflite'  # TFLite模型保存路径
+# onnx_to_tflite(onnx_model_path, tf_model_path, tflite_model_path)
+
+
+onnx_to_mnn(onnx_model_path)
