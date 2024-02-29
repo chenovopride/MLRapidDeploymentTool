@@ -22,7 +22,7 @@ st.markdown(
         background-color: #333;
         color: white;
         padding: 10px 24px;
-        border-radius: 5px;
+        border-radius: 10px;
         text-align: center;
     }
     </style>
@@ -33,15 +33,16 @@ st.markdown(
 # Creating a sidebar for inputs
 with st.sidebar:
     st.header('Upload Files')
-    uploaded_model = st.file_uploader("Upload your model", type=["h5", "hdf5", "pb", "pt", "pth"])
-    uploaded_data = st.file_uploader("Upload test data", type=["csv", "txt", "json"])
+    uploaded_model = st.file_uploader("Upload your onnx model", type=["onnx", "notSupportOthers"])
+    # uploaded_data = st.file_uploader("Upload test data", type=["csv", "txt", "json"])
 
     st.header('Configuration')
-    output_format = st.selectbox("Select output format", ['Format 1', 'Format 2', 'Format 3'])
+    output_format = st.selectbox("Select output format", ['onnx', 'mnn', 'tflite','tensorflow'])
     priority = st.radio("Select priority", ['Accuracy', 'Latency'])
 
     if st.button('Generate'):
         st.sidebar.success("Model generation started!")
+        # 在这里开始调后端？后端信息传给下面st.progress(50)那里
 
 # Main content
 st.write("# Model Optimization Interface", unsafe_allow_html=True)
@@ -59,6 +60,9 @@ with st.container():
 
 # Sample code area
 with st.container():
+
+    # 这里用来写gpt生成的辅助部署的代码，这个st.code竟然提供直接复制按钮，牛
+    
     st.write("## Sample code for the use of the model is generated here for the user's reference", unsafe_allow_html=True)
     st.code('''
 # Sample code for model usage
