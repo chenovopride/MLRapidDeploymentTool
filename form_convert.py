@@ -126,18 +126,15 @@ def onnx_to_mnn(onnx_model_path, mnn_model_path=None, convert_model_path = "conv
     - mnn_model_path: Path where the optimized ONNX model will be saved.
     - convert_model_path: Default path for converted model.
     """
-    
+
     if mnn_model_path == None:
         mnn_model_path_name = Path(onnx_model_path).name[0:-5] +".mnn"
         # mnn_model_path = convert_model_path + mnn_model_path_name
         mnn_model_path = os.path.join(os.getcwd(), convert_model_path, mnn_model_path_name)
-        # print("os.getcwd():", os.getcwd())
         print("onnx_model_path:", onnx_model_path)
         print("mnn_model_path:", mnn_model_path)
     else:
         mnn_model_path = mnn_model_path
-    #./MNNConvert -f ONNX --modelFile XXX.onnx --MNNModel XXX.mnn --bizCode biz
-
 
     command = 'MNNConvert'
     # 将命令的各个部分组合成一个列表
@@ -153,9 +150,19 @@ def onnx_to_mnn(onnx_model_path, mnn_model_path=None, convert_model_path = "conv
         print("Error message:", result.stderr)
 # onnx to trt
 
-def onnx_to_tflite(onnx_model_path, tf_model_path, tflite_model_path):
+def onnx_to_tflite(onnx_model_path, tflite_model_path=None, convert_model_path = "converted_models"):
 
-    # 加载ONNX模型
+    tf_model_path_name = Path(onnx_model_path).name[0:-5]+"_tf"
+    tf_model_path = os.path.join(os.getcwd(), convert_model_path, tf_model_path_name)
+
+    if tflite_model_path == None:
+        tflite_model_path_name = Path(onnx_model_path).name[0:-5] +".tflite"
+        tflite_model_path = os.path.join(os.getcwd(), convert_model_path, tflite_model_path_name)
+        print("onnx_model_path:", onnx_model_path)
+        print("tflite_model_path:", tflite_model_path_name)
+    else:
+        tflite_model_path = tflite_model_path
+
     onnx_model = onnx.load(onnx_model_path)
 
     # 使用onnx-tf转换ONNX模型为TensorFlow模型
@@ -164,19 +171,18 @@ def onnx_to_tflite(onnx_model_path, tf_model_path, tflite_model_path):
 
     # 转换为tflite模型
     converter = tf.lite.TFLiteConverter.from_saved_model(tf_model_path)
+    converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS, 
+                                            # ↑ 这个参数指定使用 TensorFlow Lite 的内置操作集合。内置操作是专门为 TensorFlow Lite 优化过的，可以在不同的平台上提供高效的性能。
+                                            # ↓ 这个参数指定允许使用 TensorFlow 操作集合中的操作，这些操作在 TensorFlow Lite 中没有专门的内置实现。
+                                            tf.lite.OpsSet.SELECT_TF_OPS]
+    # converter._experimental_lower_tensor_list_ops = False
     tflite_model = converter.convert()
 
     # 保存TFLite模型
     with open(tflite_model_path, 'wb') as f:
         f.write(tflite_model)
 
-# 第一步：将ONNX模型转换为TensorFlow模型
 onnx_model_path = r'onnx_models\model_c2_dep4_db18_gun.onnx'
-# onnx_model_path = 'your_model.onnx'  # ONNX模型文件路径
-# tf_model_path = 'your_tf_model'  # TensorFlow模型保存路径
-# # 第二步：将TensorFlow模型转换为TFLite模型
-# tflite_model_path = 'your_model.tflite'  # TFLite模型保存路径
-# onnx_to_tflite(onnx_model_path, tf_model_path, tflite_model_path)
 
-
-onnx_to_mnn(onnx_model_path)
+onnx_to_tflite(onnx_model_path)
+# onnx_to_mnn(onnx_model_path)

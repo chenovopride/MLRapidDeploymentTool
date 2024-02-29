@@ -1,5 +1,9 @@
 *.onnx
 *.pth
+*.tflite
+*.mnn
+*.trt
+*.ncnn
 your_tf_model/
 converted_models/
 .__convert_external_data.bin
