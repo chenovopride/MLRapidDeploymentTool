@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <title>Model Optimization Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 960px;
+            margin: auto;
+            padding: 2rem;
+        }
+        .grid {
+            display: grid;
+            grid-gap: 2rem;
+        }
+        section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #333;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted black;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            
+            /* Position the tooltip */
+            position: absolute;
+            z-index: 1;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+    <nav class="container-fluid">
+        <ul>
+            <li><strong>Model Optimization</strong></li>
+        </ul>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#" role="button">Contact</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <div class="grid">
+            <section>
+                <h2>产品设计</h2>
+                <div class="side-bar">
+                    <h3>侧边操作栏</h3>
+                    <input type="file" id="model-upload" name="model-upload" aria-label="Upload your model" placeholder="Upload Your Model">
+                    <div class="basic-options">
+                        <label for="model-format">模型转换格式选择：</label>
+                        <select id="model-format" name="model-format">
+                            <option value="mnn">mnn</option>
+                            <option value="trt">trt</option>
+                            <option value="ncnn">ncnn</option>
+                            <!-- Add more options here -->
+                        </select>
+
+                        <label class="tooltip">模型量化
+                            <input type="checkbox" id="model-quantization" name="model-quantization">
+                            <span class="tooltiptext">模型量化会减小模型体积但是会损失精度</span>
+                        </label>
+                        <label class="tooltip">简单优化
+                            <input type="checkbox" id="simple-optimization" name="simple-optimization">
+                            <span class="tooltiptext">简单优化仅消除冗余操作，不影响精度</span>
+                        </label>
+                    </div>
+                    <div class="advanced-options">
+                        <input type="checkbox" id="all-optimizations" class="toggle">
+                        <label for="all-optimizations">进行所有优化，并自动生成最优模型</label>
+                        <div id="advanced-settings" style="display:none;">
+                            <input type="text" id="model-input-size" name="model-input-size" placeholder="填写模型输入尺寸">
+                            <label for="priority">更注重：</label>
+                            <select id="priority" name="priority">
+                                <option value="accuracy">准确性</option>
+                                <option value="latency">延迟</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="button" onclick="alert('模型优化函数执行中...')">Generate</button>
+                </div>
+                <div class="main-content">
+                    <h3>右边主要栏目：</h3>
+                    <p>静态说明，显示log信息，文字等</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="container">
+        <small>
+            <a href="#">Privacy Policy</a> • <a href="#">Terms of Service</a>
+        </small>
+    </footer>
+
+    <script>
+        // JavaScript to toggle advanced options
+        document.getElementById('all-optimizations').addEventListener('change', function() {
+            var advancedSettings = document.getElementById('advanced-settings');
+            if(this.checked) {
+                advancedSettings.style.display = 'block';
+            } else {
+                advancedSettings.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
