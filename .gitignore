@@ -8,3 +8,4 @@ your_tf_model/
 converted_models/
 .__convert_external_data.bin
 .vscode
+__pycache__/
