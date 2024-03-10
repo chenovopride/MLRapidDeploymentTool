@@ -13,6 +13,10 @@ if 'see_opt_model' not in st.session_state:
 if 'see_ori_model' not in st.session_state:
     st.session_state.see_ori_model = False
 
+if 'out_model_path' not in st.session_state:
+    st.session_state.out_model_path = None
+
+
 def display_main_info():
     st.write("## MLRapidDeploymentTool: Optimize Your AI Models and Convert to the Target Format <br><br>", unsafe_allow_html=True)
     # st.subheader('右边主要栏目：')
@@ -36,16 +40,26 @@ def visualize_model(model_path):
     # 可选：Python自动打开网页（取决于用户的浏览器设置和权限）
     webbrowser.open_new_tab("http://localhost:8080")
 
-def model_variant_generate(input_model_path, out_format = "onnx", quant = False, optimize = False, output_model_dir = "converted_models"):
+def model_variant_generate(input_model_path, out_format = "onnx", quant = False, optimize = False, advance = False, optimization_priority = None, output_model_dir = "converted_models"):
 
     st.session_state.generate = True
-    model_variant_generate_backend(input_model_path, out_format, quant, optimize, output_model_dir)
 
-    with st.spinner('Model generation progress...'):
-        time.sleep(5)
-    # model_variant_generate_state(input_model_path, out_format, quant, optimize, output_model_dir)
+    if (out_format == "onnx") and (quant == False) and (optimize == False) and  (advance == False):
+        opt_model_path = input_model_path
+        print("用户没有选择任何转换和优化操作！！")
+    else:
+        opt_model_path = model_variant_generate_backend(input_model_path, out_format, quant, optimize, advance, optimization_priority, output_model_dir)
     
+    if opt_model_path != None:
+        # 转换成功
+        print("转换操作成功")
+        st.session_state.out_model_path = opt_model_path
 
+        with st.spinner('Model generation progress...'):
+            time.sleep(3)
+        # model_variant_generate_state(input_model_path, out_format, quant, optimize, output_model_dir)
+    else:
+        print("转换操作失败")
 
 def display_the_sidebar():
     
@@ -72,7 +86,10 @@ def display_the_sidebar():
 
         # 侧边栏 - 基础选项
         st.sidebar.subheader('基础选项')
-        model_format = st.sidebar.selectbox('模型转换格式选择', ['onnx', 'mnn', 'tflite', 'tf', '...'])
+        model_format = st.sidebar.selectbox('模型转换格式选择', ['onnx', 'mnn', 'tflite', 'tf', 'coreML','...'])
+        # if model_format == 'onnx':
+        #     st.sidebar.info('模型将继续保持onnx格式，仅进行您选择的优化')
+        st.caption("选择您想要转换的模型格式，如果选择onnx格式，将不进行格式转换。", unsafe_allow_html=True)
         quantize_model = st.sidebar.checkbox('是否需要模型量化')
         optimize_model = st.sidebar.checkbox('是否需要经过简单优化')
 
@@ -83,18 +100,24 @@ def display_the_sidebar():
             st.sidebar.info('简单优化仅消除冗余操作，不影响精度')
 
         st.markdown("---")
+
+        advance = False 
+        optimization_priority = None
         # 侧边栏 - 高级选项
         if st.sidebar.checkbox('高级选项'):
             st.caption("选择后，软件可自动帮您生成所有可能的优化结果，并自动测试推理延迟，返回最优模型。", unsafe_allow_html=True)
             st.sidebar.text_input('填写模型输入尺寸')
             optimization_priority = st.sidebar.radio(
-                '更注重准确性还是延迟', ['准确性', '延迟']
+                '更注重准确性还是延迟', ['accuracy', 'lantency']
             )
-        
-        if st.button('Generate!', type="primary",
-                     on_click = model_variant_generate,
-                     args=(uploaded_model_path, model_format, quantize_model, optimize_model, )
-                     ):
+            advance = True
+        generate_button = st.button('Generate!', type="primary")
+        if generate_button:
+            model_variant_generate(uploaded_model_path, model_format, quantize_model, optimize_model, advance, optimization_priority)
+        # if st.button('Generate!', type="primary",
+        #              on_click = model_variant_generate,
+        #              args=(uploaded_model_path, model_format, quantize_model, optimize_model, advance, optimization_priority, )
+        #              ):
             if uploaded_model_path == None:
                 st.sidebar.info('您还未选择模型！')
             else:
@@ -109,10 +132,6 @@ def display_progress_info(model_path = None):
     else:
         opt_model_path = model_path
 
-    # download_generated_model(opt_model_path)
-
-    # TODO2: 点击这个button后 display_progress_info 里面的所有信息就不见了
-    # st.button('查看生成的模型结构', on_click = visualize_model, args=(opt_model_path,))
     see_opt_model_button = st.button('查看生成的模型结构', key = "see_opt_model")
     # download_clicked_button = st.button('下载生成的模型', key = "download_clicked")
 
@@ -120,6 +139,7 @@ def display_progress_info(model_path = None):
         visualize_model(opt_model_path)
         print("st.session_state.see_opt_model:", st.session_state.see_opt_model)
 
+    print("用户正在下载优化后的模型：", opt_model_path)
     with open(opt_model_path, "rb") as file:
         btn = st.download_button(
                 label="下载生成的模型",
@@ -127,6 +147,8 @@ def display_progress_info(model_path = None):
                 file_name="your_model.onnx",
                 mime="application/octet-stream"
             )
+        
+    print("-----模型下载完毕-----")
 
     
 def download_generated_model(model_path):
@@ -179,5 +201,5 @@ display_main_info()
 
 if st.session_state.generate == True:
     st.success('模型转换：<br>模型优化：<br>已全部成功！')
-    display_progress_info()
+    display_progress_info(st.session_state.out_model_path)
     display_sample_code()

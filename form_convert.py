@@ -8,6 +8,9 @@ import tensorflow_probability
 from pathlib import Path
 import os
 import subprocess
+import coremltools as ct
+# import onnx_coreml
+
 
 '''
 本页代码提供onnx模型转换功能。支持的目标格式有：
@@ -145,10 +148,13 @@ def onnx_to_mnn(onnx_model_path, mnn_model_path=None, convert_model_path = "conv
     if result.returncode == 0:
         # print(result.stdout)
         print("MNN model converted successfully!")
+        return mnn_model_path
     else:
         print("Failed to convert the mnn model.")
         print("Error message:", result.stdout)
         print("Error message:", result.stderr)
+        return None
+
 # onnx to trt
 
 def onnx_to_tflite(onnx_model_path, tflite_model_path=None, convert_model_path = "converted_models"):
@@ -183,6 +189,8 @@ def onnx_to_tflite(onnx_model_path, tflite_model_path=None, convert_model_path =
     with open(tflite_model_path, 'wb') as f:
         f.write(tflite_model)
 
+    return tflite_model_path
+
 def onnx_to_tensorflow(onnx_model_path, tf_model_path=None, convert_model_path = "converted_models"):
 
     if tf_model_path == None:
@@ -199,8 +207,53 @@ def onnx_to_tensorflow(onnx_model_path, tf_model_path=None, convert_model_path =
     tf_rep = prepare(onnx_model)
     tf_rep.export_graph(tf_model_path)
 
+    return tf_model_path
+
+def onnx_to_coreml(onnx_model_path, coreml_model_path=None, convert_model_path = "converted_models"):
+    
+    '''
+    有问题，会转换失败
+    '''
+    # model_coreml = ct.converters.onnx.convert(model=onnx_model_path)
+
+    if coreml_model_path == None:
+        coreml_model_path_name = Path(onnx_model_path).name[0:-5] +".mlmodel"
+        coreml_model_path = os.path.join(os.getcwd(), convert_model_path, coreml_model_path_name)
+        print("onnx_model_path:", onnx_model_path)
+        print("coreml_model_path:", coreml_model_path)
+
+    # 保存CoreML模型
+    # coreml_model = onnx_coreml.convert(onnx_model_path)
+    # 使用coremltools将ONNX模型转换为CoreML格式
+    coreml_model = ct.converters.onnx.convert(model=onnx_model_path)  
+    coreml_model.save(coreml_model_path)
+
+    return coreml_model_path
+
+def tf_to_coreml(tf_model_dir, coreml_model_path=None, convert_model_path = "converted_models"):
+
+    '''
+    有问题，会转换失败
+    '''
+
+    if coreml_model_path == None:
+        coreml_model_path_name = Path(tf_model_dir).name +".mlmodel"
+        coreml_model_path = os.path.join(os.getcwd(), convert_model_path, coreml_model_path_name)
+        print("coreml_model_path:", coreml_model_path)
+
+    # 转换模型
+    # 如果你的模型有特定的输入输出格式要求，可能需要在这里指定
+    model = ct.convert(
+        tf_model_dir,
+        source='tensorflow'
+    )
+    # 保存转换后的 Core ML 模型
+    model.save(coreml_model_path)
+ 
 onnx_model_path = r'onnx_models\model_c2_dep4_db18_gun.onnx'
+tf_model_path = r'converted_models\model_c2_dep4_db18_gun_tf'
 
 # onnx_to_tflite(onnx_model_path)
 # onnx_to_tensorflow(onnx_model_path)
 # onnx_to_mnn(onnx_model_path)
+# tf_to_coreml(tf_model_path)

@@ -46,6 +46,8 @@ def onnx_simple(onnx_model_path, output_path=None):
     onnx.save(model_simp, output_path)
     print('finished exporting simplified onnx!')
 
+    return output_path
+
 def optimize_onnx_model(input_model_path, output_model_path=None):
     """
     Optimize an ONNX model using the onnxoptimizer.
@@ -69,6 +71,8 @@ def optimize_onnx_model(input_model_path, output_model_path=None):
         print("Failed to optimize the model.")
         print("Error message:", result.stderr)
 
+    return output_model_path
+
 def onnx_to_fp16(output_path):
 
     out_model = convert_float_to_float16(onnx_model)
@@ -90,7 +94,7 @@ def onnx_quantize_dynamic(onnx_model_path, quant_type = "int8", output_path=None
                    next to the original model with a "_quant" suffix.
 
     Returns:
-    - None
+    - output_path: Path
     """
         
     if quant_type == "int8":
@@ -106,20 +110,15 @@ def onnx_quantize_dynamic(onnx_model_path, quant_type = "int8", output_path=None
         output_path = output_path
 
     print("Start quantization...")
-    # quantize_dynamic (
-    #     model_input=onnx_model_path, # 输入模型
-    #     model_output=model_quant_dynamic, # 输出模型
-    #     weight_type=qtype, # 参数类型 Int8 / UInt8
-    #     optimize_model=True # 是否优化模型这个参数新版本没了
-    # )
 
     quantize_dynamic (
         model_input=onnx_model_path, # 输入模型
         model_output=output_path, # 输出模型
-        weight_type=qtype,
-        optimize_model=True
+        weight_type=qtype
     )
     print(f"Dynamic quantization success! Model saved to {output_path}")
+
+    return output_path
 
 
 def onnx_infer(onnx_model_path, input_data_shape, input_data = None):
@@ -188,7 +187,7 @@ def infer_mean_time_measurement(func, loop_cnt=20):
 
 
 
-onnx_model_path = r'onnx_models\model_c2_dep4_db18_gun.onnx'
+# onnx_model_path = r'onnx_models\model_c2_dep4_db18_gun.onnx'
 
 
 # optimize_onnx_model(onnx_model_path)
