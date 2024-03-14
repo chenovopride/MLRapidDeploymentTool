@@ -1,21 +1,8 @@
 import streamlit as st
 import subprocess
 import webbrowser
-from varient_generate_select import *
+from XdeployAI.varient_generate_select import *
 import time
-
-if 'generate' not in st.session_state:
-    st.session_state.generate = False
-if 'download_clicked' not in st.session_state:
-    st.session_state.download_clicked = False
-if 'see_opt_model' not in st.session_state:
-    st.session_state.see_opt_model = False
-if 'see_ori_model' not in st.session_state:
-    st.session_state.see_ori_model = False
-
-if 'out_model_path' not in st.session_state:
-    st.session_state.out_model_path = None
-
 
 def display_main_info():
     st.write("## MLRapidDeploymentTool: Optimize Your AI Models and Convert to the Target Format <br><br>", unsafe_allow_html=True)
@@ -62,17 +49,19 @@ def model_variant_generate(input_model_path, out_format = "onnx", quant = False,
         print("转换操作失败")
 
 def display_the_sidebar():
-    
+
     with st.sidebar:
 
         # 侧边栏 - 模型上传
         st.header('操作栏')
         uploaded_model = st.file_uploader("上传您的.onnx模型", type=["onnx"])
-
         uploaded_model_path = None
 
         # 如果上传了model
         if uploaded_model is not None:
+            if not os.path.exists('onnx_uploads'):
+                os.makedirs('onnx_uploads', exist_ok=True)
+
             file_path = "onnx_uploads/temp_" + uploaded_model.name
             uploaded_model_path = file_path
 
@@ -124,7 +113,6 @@ def display_the_sidebar():
                 st.sidebar.success("Model generation started! May need sometime...")
 
 
-
 def display_progress_info(model_path = None):
 
     if model_path == None:
@@ -139,7 +127,7 @@ def display_progress_info(model_path = None):
         visualize_model(opt_model_path)
         print("st.session_state.see_opt_model:", st.session_state.see_opt_model)
 
-    print("用户正在下载优化后的模型：", opt_model_path)
+    print("优化后的模型：", opt_model_path)
     with open(opt_model_path, "rb") as file:
         btn = st.download_button(
                 label="下载生成的模型",
@@ -147,8 +135,10 @@ def display_progress_info(model_path = None):
                 file_name="your_model.onnx",
                 mime="application/octet-stream"
             )
-        
-    print("-----模型下载完毕-----")
+    # TODO : 这里每次点击都会显示一遍
+    if btn:
+        print("用户正在下载优化后的模型：", opt_model_path)
+        print("-----模型下载完毕-----")
 
     
 def download_generated_model(model_path):
@@ -196,10 +186,27 @@ def display_sample_code():
     # st.markdown("<div class='download-button'>Download All!</div>", unsafe_allow_html=True)
 
         
-display_the_sidebar()
-display_main_info()
 
-if st.session_state.generate == True:
-    st.success('模型转换：<br>模型优化：<br>已全部成功！')
-    display_progress_info(st.session_state.out_model_path)
-    display_sample_code()
+
+def main():
+    if 'generate' not in st.session_state:
+        st.session_state.generate = False
+    if 'download_clicked' not in st.session_state:
+        st.session_state.download_clicked = False
+    if 'see_opt_model' not in st.session_state:
+        st.session_state.see_opt_model = False
+    if 'see_ori_model' not in st.session_state:
+        st.session_state.see_ori_model = False
+    if 'out_model_path' not in st.session_state:
+        st.session_state.out_model_path = None
+
+    display_the_sidebar()
+    display_main_info()
+
+    if ('generate' in st.session_state) and (st.session_state.generate) == True:
+        st.success('模型转换：<br>模型优化：<br>已全部成功！')
+        display_progress_info(st.session_state.out_model_path)
+        display_sample_code()
+        
+if __name__ == '__main__':
+    main()

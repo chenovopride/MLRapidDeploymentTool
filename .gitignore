@@ -4,8 +4,10 @@
 *.mnn
 *.trt
 *.ncnn
+.__convert_external_data.bin
+.vscode/
+__pycache__/
 your_tf_model/
 converted_models/
-.__convert_external_data.bin
-.vscode
-__pycache__/
+build/
+build/

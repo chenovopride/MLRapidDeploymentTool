@@ -1,0 +1,4 @@
+[console_scripts]
+run = XdeployAI.run:webdemo
+tst = XdeployAI:test
+xdeployrun = XdeployAI:run_deploy

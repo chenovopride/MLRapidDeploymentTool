@@ -1,0 +1,11 @@
+streamlit
+numpy
+onnxsim
+onnx
+onnxruntime
+tensorflow
+tf2onnx
+onnx_tf
+tensorflow_probability
+coremltools
+netron

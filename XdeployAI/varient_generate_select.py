@@ -1,6 +1,6 @@
 # from form_convert import *
-from onnx_optimize import *
-from form_convert import *
+from .onnx_optimize import *
+from .form_convert import *
 
 def optimize_and_evaluate():
     pass 
@@ -52,6 +52,7 @@ def model_variant_generate_backend(input_model_path, out_format = "onnx", quant 
         if optimize == True:
             output_path = fast_optimization(input_model_path, out_format, quant, optimize)
         else:
+            # TODO 这里忘记添加量化了？
             print("用户没有选择任何转换和优化操作！！")
             output_path = input_model_path
     else:

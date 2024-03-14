@@ -1,0 +1,22 @@
+Metadata-Version: 2.1
+Name: xdeployai
+Version: 0.0.1
+Summary: 快速模型部署工具
+Home-page: https://github.com/chenovopride/MLRapidDeploymentTool
+Author: chenovopride
+Author-email: 1832292582@qq.com
+Requires-Python: >=3.8
+Requires-Dist: streamlit
+Requires-Dist: numpy
+Requires-Dist: onnx
+Requires-Dist: onnxsim
+Requires-Dist: onnxruntime
+Requires-Dist: tensorflow~=2.15.0
+Requires-Dist: tf2onnx
+Requires-Dist: tf_keras
+Requires-Dist: onnx_tf
+Requires-Dist: tensorflow_probability~=0.23.0
+Requires-Dist: netron
+Requires-Dist: coremltools
+
+项目的长描述
